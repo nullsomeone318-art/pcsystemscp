@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCP Foundation - ULTRA OS v5.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Advanced Color Palette */
+      --foundation-orange: #FF6B00;
+      --secure-green: #00FF88;
+      --contain-blue: #0066FF;
+      --protect-red: #FF0044;
+      --anomaly-purple: #8800FF;
+      --keter-crimson: #CC0000;
+      --euclid-amber: #FFB800;
+      --safe-cyan: #00CCFF;
+      --thaumiel-gold: #FFD700;
+      --apollyon-void: #000000;
+      
+      /* UI Colors */
+      --bg-primary: #0A0A0A;
+      --bg-secondary: #151515;
+      --bg-tertiary: #202020;
+      --bg-glass: rgba(10, 10, 10, 0.95);
+      --border-primary: #333;
+      --border-active: var(--foundation-orange);
+      --text-primary: #FFFFFF;
+      --text-secondary: #CCCCCC;
+      --text-muted: #888888;
+      --text-danger: var(--protect-red);
+      --text-success: var(--secure-green);
+      --text-warning: var(--euclid-amber);
+      
+      /* Advanced Shadows */
+      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.8);
+      --shadow-depth: 0 4px 16px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 20px rgba(255, 107, 0, 0.3);
+      --shadow-danger: 0 0 30px rgba(255, 0, 68, 0.4);
+      
+      /* Typography Scale */
+      --font-display: 'Orbitron', monospace;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-size-xs: 0.7rem;
+      --font-size-sm: 0.8rem;
+      --font-size-base: 0.9rem;
+      --font-size-lg: 1.1rem;
+      --font-size-xl: 1.3rem;
+      --font-size-2xl: 1.6rem;
+      --font-size-3xl: 2rem;
+      
+      /* Animation System */
+      --transition-fast: 0.15s ease-out;
+      --transition-base: 0.25s ease-out;
+      --transition-slow: 0.4s ease-out;
+      --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-base);
+      line-height: 1.4;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      overflow: hidden;
+      cursor: none;
+    }
+
+    /* Custom Cursor */
+    .cursor {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--foundation-orange);
+      border: 1px solid #FFF;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      mix-blend-mode: difference;
+      transition: transform 0.1s ease-out;
+    }
+
+    .cursor.hover {
+      transform: scale(2);
+      background: var(--secure-green);
+    }
+
+    /* CRT Effects */
+    .crt-screen {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at center, rgba(0,255,136,0.02) 0%, transparent 70%),
+        linear-gradient(90deg, transparent 0%, rgba(255,107,0,0.03) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 9999;
+      animation: crt-flicker 0.15s linear infinite alternate;
+    }
+
+    .crt-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      animation: scan-lines 0.1s linear infinite;
+    }
+
+    .crt-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 70%, rgba(0,0,0,0.3) 100%);
+    }
+
+    @keyframes crt-flicker {
+      0% { opacity: 1; }
+      98% { opacity: 1; }
+      99% { opacity: 0.98; }
+      100% { opacity: 0.99; }
+    }
+
+    @keyframes scan-lines {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(4px); }
+    }
+
+    /* Boot Sequence */
+    .boot-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      animation: fadeOut 2s ease-out 3s forwards;
+    }
+
+    .boot-logo {
+      font-family: var(--font-display);
+      font-size: var(--font-size-3xl);
+      font-weight: 900;
+      color: var(--foundation-orange);
+      text-shadow: 0 0 20px var(--foundation-orange);
+      margin-bottom: 2rem;
+      animation: glow-pulse 1s ease-in-out infinite alternate;
+    }
+
+    .boot-text {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .boot-progress {
+      width: 300px;
+      height: 2px;
+      background: var(--border-primary);
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+
+    .boot-progress::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--foundation-orange), var(--secure-green));
+      transform: translateX(-100%);
+      animation: progress-load 3s ease-out forwards;
+    }
+
+    @keyframes glow-pulse {
+      from { text-shadow: 0 0 20px var(--foundation-orange); }
+      to { text-shadow: 0 0 30px var(--foundation-orange), 0 0 40px var(--foundation-orange); }
+    }
+
+    @keyframes progress-load {
+      to { transform: translateX(0); }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; pointer-events: none; }
+    }
+
+    /* Main Layout */
+    .desktop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 30% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 68, 0.05) 0%, transparent 50%),
+        linear-gradient(45deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+
+    .desktop.active { display: flex; }
+
+    /* Header with Advanced HUD */
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 1000;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--foundation-orange);
+      text-shadow: 0 0 10px var(--foundation-orange);
+    }
+
+    .facility-status {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      border: 1px solid var(--border-primary);
+      font-size: var(--font-size-xs);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.secure { background: var(--secure-green); }
+    .status-dot.caution { background: var(--euclid-amber); }
+    .status-dot.danger { background: var(--protect-red); }
+
+    @keyframes pulse {
+      0%, 50% { opacity: 1; }
+      25%, 75% { opacity: 0.5; }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .clearance-badge {
+      background: linear-gradient(135deg, var(--foundation-orange), #FF8A00);
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: var(--font-size-sm);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .clearance-badge.level-5 {
+      background: linear-gradient(135deg, var(--protect-red), #FF0066);
+      color: #FFF;
+      box-shadow: var(--shadow-danger);
+    }
+
+    .user-info {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .clock {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      letter-spacing: 1px;
+    }
+
+    /* Main Container */
+    .main-container {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+    }
+
+    /* Advanced Sidebar */
+    .sidebar {
+      width: 320px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(15px);
+      border-right: 1px solid var(--border-primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-section {
+      flex: 1;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-primary);
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--foundation-orange);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Task System */
+    .task-item {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      transition: all var(--transition-base);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 107, 0, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .task-item:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-depth);
+    }
+
+    .task-item:hover::before {
+      left: 100%;
+    }
+
+    .task-item.completed {
+      border-color: var(--secure-green);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .task-item.active {
+      border-color: var(--euclid-amber);
+      background: rgba(255, 184, 0, 0.05);
+      animation: task-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes task-glow {
+      from { box-shadow: 0 0 5px rgba(255, 184, 0, 0.3); }
+      to { box-shadow: 0 0 15px rgba(255, 184, 0, 0.5); }
+    }
+
+    .task-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .task-description {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
+
+    .task-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .task-reward {
+      font-size: var(--font-size-xs);
+      color: var(--foundation-orange);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .task-level {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .task-level.level-1 { background: var(--safe-cyan); color: #000; }
+    .task-level.level-2 { background: var(--euclid-amber); color: #000; }
+    .task-level.level-3 { background: var(--keter-crimson); color: #FFF; }
+    .task-level.level-4 { background: var(--anomaly-purple); color: #FFF; }
+    .task-level.level-5 { background: var(--thaumiel-gold); color: #000; }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .nav-tab {
+      padding: 1rem 2rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      position: relative;
+    }
+
+    .nav-tab::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--foundation-orange);
+      transition: width var(--transition-base);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 107, 0, 0.05);
+    }
+
+    .nav-tab.active {
+      color: var(--foundation-orange);
+    }
+
+    .nav-tab.active::after {
+      width: 100%;
+    }
+
+    /* File Grid */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .file-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--border-primary);
+      transition: all var(--transition-base);
+    }
+
+    .file-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glass);
+      border-color: var(--border-active);
+    }
+
+    .file-card.safe::before { background: var(--safe-cyan); }
+    .file-card.euclid::before { background: var(--euclid-amber); }
+    .file-card.keter::before { background: var(--keter-crimson); }
+    .file-card.thaumiel::before { background: var(--thaumiel-gold); }
+    .file-card.apollyon::before { background: var(--apollyon-void); }
+    .file-card.system::before { background: var(--foundation-orange); }
+
+    .file-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 1rem;
+    }
+
+    .file-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .file-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .file-size {
+      font-size: var(--font-size-xs);
+      color: var(--text-muted);
+    }
+
+    .file-class {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .file-class.safe { background: var(--safe-cyan); color: #000; }
+    .file-class.euclid { background: var(--euclid-amber); color: #000; }
+    .file-class.keter { background: var(--keter-crimson); color: #FFF; }
+    .file-class.system { background: var(--foundation-orange); color: #000; }
+
+    .file-description {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* 3D Viewer */
+    .viewer-3d {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    .viewer-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .viewer-info {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .viewer-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .viewer-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .viewer-btn:hover {
+      border-color: var(--border-active);
+      background: var(--bg-secondary);
+    }
+
+    /* Advanced Assistant */
+    .assistant-panel {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 400px;
+      max-height: 500px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+      z-index: 1000;
+      transition: all var(--transition-bounce);
+      transform: translateY(100%);
+    }
+
+    .assistant-panel.active {
+      transform: translateY(0);
+    }
+
+    .assistant-header {
+      background: linear-gradient(135deg, var(--foundation-orange), #FF8A00);
+      color: #000;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .assistant-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--font-size-lg);
+    }
+
+    .assistant-status {
+      width: 8px;
+      height: 8px;
+      background: var(--secure-green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    .assistant-body {
+      padding: 1.5rem;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .assistant-message {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .assistant-message::before {
+      content: 'SCIPNET-09';
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      background: var(--foundation-orange);
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+    }
+
+    .assistant-message.user {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .assistant-message.user::before {
+      content: attr(data-user);
+      background: var(--secure-green);
+    }
+
+    .assistant-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .assistant-action {
+      padding: 0.5rem 1rem;
+      background: var(--foundation-orange);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .assistant-action:hover {
+      background: #FF8A00;
+      transform: translateY(-1px);
+    }
+
+    .assistant-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--foundation-orange), #FF8A00);
+      border: none;
+      border-radius: 50%;
+      color: #000;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: var(--shadow-glow);
+      transition: all var(--transition-bounce);
+      z-index: 999;
+    }
+
+    .assistant-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 107, 0, 0.5);
+    }
+
+    .assistant-toggle.hidden {
+      transform: scale(0);
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      min-width: 300px;
+      box-shadow: var(--shadow-glass);
+      z-index: 2000;
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    .notification.success { border-color: var(--secure-green); }
+    .notification.warning { border-color: var(--euclid-amber); }
+    .notification.danger { border-color: var(--protect-red); }
+
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .notification-message {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Audio Visualizer */
+    .audio-visualizer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--bg-primary);
+      z-index: 999;
+      display: flex;
+      align-items: end;
+      gap: 2px;
+      padding: 0 2px;
+    }
+
+    .audio-bar {
+      flex: 1;
+      background: linear-gradient(to top, var(--foundation-orange), var(--secure-green));
+      border-radius: 2px 2px 0 0;
+      transition: height var(--transition-fast);
+      min-height: 1px;
+    }
+
+    /* Window System */
+    .window {
+      position: absolute;
+      background: var(--bg-glass);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      box-shadow: var(--shadow-glass);
+      overflow: hidden;
+      resize: both;
+      min-width: 400px;
+      min-height: 300px;
+      z-index: 100;
+    }
+
+    .window-header {
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-primary);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+    }
+
+    .window-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .window-btn {
+      width: 20px;
+      height: 20px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .window-btn.close { background: var(--protect-red); }
+    .window-btn.minimize { background: var(--euclid-amber); }
+    .window-btn.maximize { background: var(--secure-green); }
+
+    .window-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .window-content {
+      padding: 1.5rem;
+      height: calc(100% - 80px);
+      overflow-y: auto;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .sidebar { width: 280px; }
+      .assistant-panel { width: 350px; }
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 0 1rem; }
+      .header-left { gap: 1rem; }
+      .facility-status { display: none; }
+      .sidebar { width: 240px; }
+      .file-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        padding: 1rem;
+      }
+      .assistant-panel { 
+        width: 90vw;
+        right: 5vw;
+      }
+    }
+
+    /* Hidden by default */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- Custom Cursor -->
+  <div class="cursor"></div>
+
+  <!-- CRT Effects -->
+  <div class="crt-screen"></div>
+
+  <!-- Boot Sequence -->
+  <div class="boot-screen" id="bootScreen">
+    <div class="boot-logo">SCP FOUNDATION</div>
+    <div class="boot-text">
+      SECURE • CONTAIN • PROTECT<br>
+      ULTRA OS v5.0<br><br>
+      Initializing quantum containment protocols...<br>
+      Loading anomaly detection systems...<br>
+      Establishing secure communication channels...
+    </div>
+    <div class="boot-progress"></div>
+    <div class="boot-text">Authentication required</div>
+  </div>
+
+  <!-- Main Desktop -->
+  <div class="desktop" id="desktop">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">SCP FOUNDATION</div>
+        <div class="facility-status">
+          <div class="status-indicator">
+            <div class="status-dot secure"></div>
+            <span>Site-19</span>
+          </div>
+          <div class="status-indicator">
+            <div class="status-dot caution"></div>
+            <span>3 Breaches</span>
+          </div>
+          <div class="status-indicator" id="containmentStatus">
+            <div class="status-dot secure"></div>
+            <span>Containment</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="clearance-badge" id="clearanceBadge">LEVEL 1</div>
+        <div class="user-info">
+          <div id="userName">D-9341</div>
+          <div style="font-size: 10px; opacity: 0.7;">Research Personnel</div>
+        </div>
+        <div class="clock" id="clock">00:00:00</div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Active Tasks -->
+        <section class="sidebar-section">
+          <h3 class="section-title">Active Tasks</h3>
+          <div id="taskList">
+            <!-- Tasks will be populated here -->
+          </div>
+        </section>
+
+        <!-- Keycards & Clearance -->
+        <section class="sidebar-section">
+          <h3 class="section-title">Authorization</h3>
+          <div id="keycardList">
+            <!-- Keycards will be populated here -->
+          </div>
+        </section>
+
+        <!-- Achievements -->
+        <section class="sidebar-section">
+          <h3 class="section-title">Achievements</h3>
+          <div id="badgeList">
+            <!-- Badges will be populated here -->
+          </div>
+        </section>
+      </aside>
+
+      <!-- Content Area -->
+      <main class="content-area">
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+          <button class="nav-tab active" data-tab="files">File System</button>
+          <button class="nav-tab" data-tab="facility3d">3D Facility</button>
+          <button class="nav-tab" data-tab="terminal">Terminal</button>
+          <button class="nav-tab" data-tab="research">Research</button>
+          <button class="nav-tab" data-tab="incidents">Incidents</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <div class="tab-content active" id="filesTab">
+          <div class="file-grid" id="fileGrid">
+            <!-- Files will be populated here -->
+          </div>
+        </div>
+
+        <div class="tab-content hidden" id="facility3dTab">
+          <div class="viewer-3d" id="facility3d">
+            <!-- 3D content will be inserted here -->
+            <div class="viewer-controls">
+              <div class="viewer-info">
+                Site-19 Virtual Tour • WASD: Move • Mouse: Look • Click: Interact
+              </div>
+              <div class="viewer-buttons">
+                <button class="viewer-btn" onclick="resetCamera()">Reset View</button>
+                <button class="viewer-btn" onclick="toggleFullscreen()">Fullscreen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content hidden" id="terminalTab">
+          <!-- Terminal will be populated here -->
+        </div>
+
+        <div class="tab-content hidden" id="researchTab">
+          <!-- Research content will be populated here -->
+        </div>
+
+        <div class="tab-content hidden" id="incidentsTab">
+          <!-- Incidents content will be populated here -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Assistant Panel -->
+  <div class="assistant-panel" id="assistantPanel">
+    <div class="assistant-header">
+      <div class="assistant-title">SCIPNET-09</div>
+      <div class="assistant-status"></div>
+    </div>
+    <div class="assistant-body" id="assistantBody">
+      <!-- Messages will be populated here -->
+    </div>
+  </div>
+
+  <!-- Assistant Toggle -->
+  <button class="assistant-toggle" id="assistantToggle">🤖</button>
+
+  <!-- Audio Visualizer -->
+  <div class="audio-visualizer" id="audioVisualizer">
+    <!-- Audio bars will be populated here -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Ultra-advanced SCP Foundation OS
+    
+    class SCPFoundationOS {
+      constructor() {
+        this.version = "5.0";
+        this.state = {
+          user: 'D-9341',
+          clearance: 1,
+          tasks: [],
+          completedTasks: [],
+          keycards: ['KC-1'],
+          badges: [],
+          openedFiles: [],
+          facilityStatus: 'secure',
+          activeBreaches: [],
+          researchProgress: {},
+          aiPersonality: 'professional',
+          settings: {
+            audio: true,
+            crt: true,
+            voice: true,
+            difficulty: 'normal'
+          }
+        };
+        
+        this.audio = {
+          context: null,
+          analyzer: null,
+          dataArray: null,
+          source: null
+        };
+        
+        this.ai = new AdvancedAI();
+        this.facility3D = null;
+        this.activeWindows = [];
+        this.notifications = [];
+        
+        this.init();
+      }
+      
+      async init() {
+        this.setupEventListeners();
+        this.initAudio();
+        this.initCursor();
+        this.startBootSequence();
+        this.loadState();
+        await this.ai.initialize();
+        
+        // Start systems
+        setTimeout(() => {
+          this.showDesktop();
+          this.populateInitialData();
+          this.startSystemMonitoring();
+          this.ai.greet();
+        }, 4000);
+      }
+      
+      setupEventListeners() {
+        // Cursor tracking
+        document.addEventListener('mousemove', this.updateCursor.bind(this));
+        document.addEventListener('mousedown', () => {
+          document.querySelector('.cursor').style.transform = 'scale(0.8)';
+        });
+        document.addEventListener('mouseup', () => {
+          document.querySelector('.cursor').style.transform = 'scale(1)';
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+          tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+        });
+        
+        // Assistant toggle
+        document.getElementById('assistantToggle').addEventListener('click', () => {
+          this.toggleAssistant();
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', this.handleKeyboard.bind(this));
+      }
+      
+      updateCursor(e) {
+        const cursor = document.querySelector('.cursor');
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        
+        // Hover effects
+        const hoverable = e.target.closest('button, .file-card, .task-item, a, [role="button"]');
+        cursor.classList.toggle('hover', !!hoverable);
+      }
+      
+      initCursor() {
+        document.body.style.cursor = 'none';
+      }
+      
+      initAudio() {
+        try {
+          this.audio.context = new (window.AudioContext || window.webkitAudioContext)();
+          this.audio.analyzer = this.audio.context.createAnalyser();
+          this.audio.analyzer.fftSize = 256;
+          this.audio.dataArray = new Uint8Array(this.audio.analyzer.frequencyBinCount);
+          
+          // Create ambient facility audio
+          this.createAmbientSound();
+          this.setupAudioVisualizer();
+        } catch (e) {
+          console.warn('Audio context not available:', e);
+        }
+      }
+      
+      createAmbientSound() {
+        if (!this.audio.context) return;
+        
+        // Create subtle ambient facility hum
+        const oscillator = this.audio.context.createOscillator();
+        const gainNode = this.audio.context.createGain();
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(60, this.audio.context.currentTime); // 60Hz hum
+        gainNode.gain.setValueAtTime(0.01, this.audio.context.currentTime);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audio.analyzer);
+        this.audio.analyzer.connect(this.audio.context.destination);
+        
+        oscillator.start();
+      }
+      
+      setupAudioVisualizer() {
+        const visualizer = document.getElementById('audioVisualizer');
+        
+        // Create audio bars
+        for (let i = 0; i < 128; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'audio-bar';
+          visualizer.appendChild(bar);
+        }
+        
+        this.animateAudioVisualizer();
+      }
+      
+      animateAudioVisualizer() {
+        if (!this.audio.analyzer) return;
+        
+        requestAnimationFrame(() => this.animateAudioVisualizer());
+        
+        this.audio.analyzer.getByteFrequencyData(this.audio.dataArray);
+        const bars = document.querySelectorAll('.audio-bar');
+        
+        bars.forEach((bar, index) => {
+          const value = this.audio.dataArray[index] || 0;
+          const height = (value / 255) * 4;
+          bar.style.height = Math.max(1, height) + 'px';
+        });
+      }
+      
+      startBootSequence() {
+        // Simulated boot process with realistic delays
+        setTimeout(() => {
+          document.getElementById('bootScreen').style.display = 'none';
+        }, 4000);
+      }
+      
+      showDesktop() {
+        document.getElementById('desktop').classList.add('active');
+        this.startClock();
+      }
+      
+      startClock() {
+        setInterval(() => {
+          const now = new Date();
+          const timeString = now.toLocaleTimeString('pl-PL', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+          document.getElementById('clock').textContent = timeString;
+        }, 1000);
+      }
+      
+      populateInitialData() {
+        this.loadTasks();
+        this.loadFiles();
+        this.loadKeycards();
+        this.updateUI();
+      }
+      
+      loadTasks() {
+        this.state.tasks = [
+          {
+            id: 'welcome',
+            title: 'Foundation Orientation',
+            description: 'Complete basic orientation and read security protocols in README.txt',
+            level: 1,
+            status: 'active',
+            progress: 0,
+            reward: { type: 'badge', id: 'orientation' },
+            requirements: ['readme-read']
+          },
+          {
+            id: 'clearance-upgrade',
+            title: 'Security Clearance Upgrade',
+            description: 'Access 3 SCP documents to prove readiness for Level 2 clearance',
+            level: 1,
+            status: 'available',
+            progress: 0,
+            reward: { type: 'keycard', id: 'KC-2' },
+            requirements: ['scp-files-3']
+          },
+          {
+            id: 'facility-tour',
+            title: 'Facility Navigation',
+            description: 'Complete 3D facility tour and visit all accessible areas',
+            level: 1,
+            status: 'available',
+            progress: 0,
+            reward: { type: 'badge', id: 'explorer' },
+            requirements: ['facility-tour-complete']
+          }
+        ];
+        
+        this.renderTasks();
+      }
+      
+      loadFiles() {
+        this.files = [
+          // System Files
+          {
+            id: 'readme',
+            name: 'README.txt',
+            type: 'system',
+            classification: 'system',
+            size: '2.1 KB',
+            level: 1,
+            icon: '📄',
+            description: 'Foundation orientation and basic protocols'
+          },
+          {
+            id: 'terminal',
+            name: 'TERMINAL.exe',
+            type: 'system',
+            classification: 'system',
+            size: '1.2 MB',
+            level: 1,
+            icon: '💻',
+            description: 'Advanced terminal interface with facility access'
+          },
+          {
+            id: 'facility3d',
+            name: 'FACILITY3D.exe',
+            type: 'system',
+            classification: 'system',
+            size: '847 KB',
+            level: 1,
+            icon: '🏢',
+            description: 'Immersive 3D facility navigation system'
+          },
+          
+          // SCP Documents - Level 1
+          {
+            id: 'scp-173',
+            name: 'SCP-173.doc',
+            type: 'scp',
+            classification: 'euclid',
+            size: '4.7 KB',
+            level: 1,
+            icon: '🗿',
+            description: 'The Sculpture - Euclid class entity requiring constant observation'
+          },
+          {
+            id: 'scp-999',
+            name: 'SCP-999.doc',
+            type: 'scp',
+            classification: 'safe',
+            size: '3.2 KB',
+            level: 1,
+            icon: '🟠',
+            description: 'The Tickle Monster - Benevolent orange entity with therapeutic properties'
+          },
+          {
+            id: 'scp-914',
+            name: 'SCP-914.doc',
+            type: 'scp',
+            classification: 'safe',
+            size: '6.8 KB',
+            level: 1,
+            icon: '⚙️',
+            description: 'The Clockworks - Anomalous mechanical refining machine'
+          },
+          
+          // SCP Documents - Level 2
+          {
+            id: 'scp-096',
+            name: 'SCP-096.doc',
+            type: 'scp',
+            classification: 'euclid',
+            size: '7.1 KB',
+            level: 2,
+            icon: '👤',
+            description: 'The Shy Guy - Extremely dangerous when face is observed'
+          },
+          {
+            id: 'scp-049',
+            name: 'SCP-049.doc',
+            type: 'scp',
+            classification: 'euclid',
+            size: '8.9 KB',
+            level: 2,
+            icon: '👨‍⚕️',
+            description: 'Plague Doctor - Humanoid entity obsessed with curing "Pestilence"'
+          },
+          
+          // SCP Documents - Level 3
+          {
+            id: 'scp-682',
+            name: 'SCP-682.doc',
+            type: 'scp',
+            classification: 'keter',
+            size: '24.3 KB',
+            level: 3,
+            icon: '🐉',
+            description: 'Hard-to-Destroy Reptile - Hostile entity with extreme regeneration'
+          },
+          {
+            id: 'scp-106',
+            name: 'SCP-106.doc',
+            type: 'scp',
+            classification: 'keter',
+            size: '11.7 KB',
+            level: 3,
+            icon: '👻',
+            description: 'The Old Man - Predatory entity capable of dimensional manipulation'
+          }
+        ];
+        
+        this.renderFiles();
+      }
+      
+      loadKeycards() {
+        this.keycards = {
+          'KC-1': { level: 1, name: 'Personnel', color: '#888888' },
+          'KC-2': { level: 2, name: 'Researcher', color: '#00FF88' },
+          'KC-3': { level: 3, name: 'Senior Staff', color: '#FFB800' },
+          'KC-4': { level: 4, name: 'Site Director', color: '#FF0044' },
+          'KC-5': { level: 5, name: 'O5 Council', color: '#8800FF' }
+        };
+      }
+      
+      renderTasks() {
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+        
+        this.state.tasks.forEach(task => {
+          const taskElement = document.createElement('div');
+          taskElement.className = `task-item ${task.status}`;
+          taskElement.innerHTML = `
+            <div class="task-title">${task.title}</div>
+            <div class="task-description">${task.description}</div>
+            <div class="task-progress">
+              <span class="task-reward">+${task.reward.type.toUpperCase()}</span>
+              <span class="task-level level-${task.level}">Level ${task.level}</span>
+            </div>
+          `;
+          
+          taskElement.addEventListener('click', () => this.selectTask(task));
+          taskList.appendChild(taskElement);
+        });
+      }
+      
+      renderFiles() {
+        const fileGrid = document.getElementById('fileGrid');
+        fileGrid.innerHTML = '';
+        
+        this.files.forEach(file => {
+          const hasAccess = this.state.clearance >= file.level;
+          const isNew = !this.state.openedFiles.includes(file.id) && hasAccess;
+          
+          const fileElement = document.createElement('div');
+          fileElement.className = `file-card ${file.classification}`;
+          if (isNew) fileElement.classList.add('new');
+          
+          fileElement.innerHTML = `
+            <div class="file-icon">${file.icon}</div>
+            <div class="file-title">${file.name}</div>
+            <div class="file-meta">
+              <span class="file-size">${file.size}</span>
+              <span class="file-class ${file.classification}">${hasAccess ? file.classification.toUpperCase() : `LEVEL ${file.level}`}</span>
+            </div>
+            <div class="file-description">${file.description}</div>
+          `;
+          
+          if (!hasAccess) {
+            fileElement.style.opacity = '0.5';
+            fileElement.style.cursor = 'not-allowed';
+          }
+          
+          fileElement.addEventListener('click', () => {
+            if (hasAccess) {
+              this.openFile(file);
+            } else {
+              this.showNotification('Access Denied', `Level ${file.level} clearance required`, 'danger');
+              this.ai.respond('access_denied', { file: file.name, level: file.level });
+            }
+          });
+          
+          fileGrid.appendChild(fileElement);
+        });
+      }
+      
+      openFile(file) {
+        if (!this.state.openedFiles.includes(file.id)) {
+          this.state.openedFiles.push(file.id);
+          this.saveState();
+        }
+        
+        switch (file.id) {
+          case 'terminal':
+            this.openTerminal();
+            break;
+          case 'facility3d':
+            this.switchTab('facility3d');
+            this.init3DFacility();
+            break;
+          case 'readme':
+            this.openDocument(file, this.getReadmeContent());
+            this.completeRequirement('readme-read');
+            break;
+          default:
+            if (file.type === 'scp') {
+              this.openSCPDocument(file);
+              this.checkSCPProgress();
+            } else {
+              this.openDocument(file, 'File content would be displayed here...');
+            }
+        }
+        
+        this.ai.respond('file_opened', { file: file.name, type: file.type });
+        this.updateUI();
+      }
+      
+      openDocument(file, content) {
+        const window = this.createWindow(file.name, content || 'Loading...', {
+          width: '600px',
+          height: '500px'
+        });
+      }
+      
+      openSCPDocument(file) {
+        const scpContent = this.getSCPContent(file.id);
+        this.openDocument(file, scpContent);
+      }
+      
+      getSCPContent(scpId) {
+        const scpData = {
+          'scp-173': {
+            object: 'SCP-173',
+            class: 'Euclid',
+            procedures: 'Personnel must maintain direct eye contact with SCP-173 at all times. No fewer than two persons may enter SCP-173\'s container at any time. If eye contact is broken, immediate evacuation protocols must be followed.',
+            description: 'SCP-173 is a sculpture of unknown origin, constructed from concrete and rebar with traces of Krylon brand spray paint. It is animate and extremely hostile, capable of moving at high speeds when not being observed.',
+            addendum: 'SCP-173 appears to be sentient and shows clear signs of planning in its attacks. All interactions must be logged.'
+          },
+          'scp-999': {
+            object: 'SCP-999',
+            class: 'Safe',
+            procedures: 'SCP-999 is allowed to freely roam the facility. Personnel are encouraged to interact with SCP-999 as its presence has been shown to improve morale and reduce stress-related incidents.',
+            description: 'SCP-999 appears as a large, orange, gelatinous blob weighing approximately 54 kg. It possesses a friendly, playful personality and seems to enjoy physical contact with humans.',
+            addendum: 'SCP-999 has shown remarkable ability to calm aggressive subjects and has been instrumental in several containment breach resolutions.'
+          },
+          'scp-914': {
+            object: 'SCP-914',
+            class: 'Safe',
+            procedures: 'SCP-914 is to be contained in Research Sector-19. Before any experimentation, approval from at least one Level 3 researcher is required. No organic material is to be processed through SCP-914.',
+            description: 'SCP-914 is a large clockwork machine weighing several tons. It consists of screw drives, belts, pulleys, gears, springs and other clockwork mechanisms. When an object is placed in the "Intake" booth and a setting is selected, SCP-914 will "refine" the object.',
+            addendum: 'The machine has five settings: Rough, Coarse, 1:1, Fine, and Very Fine. Results become increasingly unpredictable at higher settings.'
+          }
+        };
+        
+        const data = scpData[scpId];
+        if (!data) return 'SCP data not available.';
+        
+        return `
+          <div style="font-family: var(--font-mono); line-height: 1.6; color: var(--text-primary);">
+            <h1 style="color: var(--foundation-orange); font-family: var(--font-display); margin-bottom: 2rem;">
+              ${data.object}
+            </h1>
+            
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+              <strong style="color: var(--text-warning);">Object Class:</strong> ${data.class}
+            </div>
+            
+            <h3 style="color: var(--secure-green); margin: 1.5rem 0 0.75rem;">Special Containment Procedures:</h3>
+            <p style="margin-bottom: 1.5rem;">${data.procedures}</p>
+            
+            <h3 style="color: var(--contain-blue); margin: 1.5rem 0 0.75rem;">Description:</h3>
+            <p style="margin-bottom: 1.5rem;">${data.description}</p>
+            
+            <h3 style="color: var(--anomaly-purple); margin: 1.5rem 0 0.75rem;">Addendum:</h3>
+            <p>${data.addendum}</p>
+          </div>
+        `;
+      }
+      
+      getReadmeContent() {
+        return `
+          <div style="font-family: var(--font-mono); line-height: 1.6; color: var(--text-primary);">
+            <h1 style="color: var(--foundation-orange); font-family: var(--font-display); margin-bottom: 2rem;">
+              SCP FOUNDATION - SITE-19 ORIENTATION
+            </h1>
+            
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--foundation-orange);">
+              <strong>Welcome to the SCP Foundation</strong><br>
+              Your designation: <span style="color: var(--secure-green);">${this.state.user}</span><br>
+              Security Clearance: <span style="color: var(--euclid-amber);">Level ${this.state.clearance}</span>
+            </div>
+            
+            <h3 style="color: var(--secure-green); margin: 1.5rem 0 0.75rem;">Mission Statement</h3>
+            <p>The SCP Foundation exists to <strong>Secure</strong>, <strong>Contain</strong>, and <strong>Protect</strong> anomalous objects, entities, and phenomena that threaten normalcy and human safety.</p>
+            
+            <h3 style="color: var(--contain-blue); margin: 1.5rem 0 0.75rem;">Security Protocols</h3>
+            <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+              <li>Always verify your clearance level before accessing documents</li>
+              <li>Report any anomalous activity immediately to Site Security</li>
+              <li>Never attempt to access SCPs above your clearance level</li>
+              <li>Maintain professional demeanor when interacting with SCIPNET-09</li>
+            </ul>
+            
+            <h3 style="color: var(--anomaly-purple); margin: 1.5rem 0 0.75rem;">Object Classifications</h3>
+            <ul style="margin-left: 2rem; margin-bottom: 1.5rem;">
+              <li><strong style="color: var(--safe-cyan);">Safe:</strong> Easily contained with minimal resources</li>
+              <li><strong style="color: var(--euclid-amber);">Euclid:</strong> Requires more extensive containment procedures</li>
+              <li><strong style="color: var(--keter-crimson);">Keter:</strong> Extremely difficult to contain, poses significant threat</li>
+              <li><strong style="color: var(--thaumiel-gold);">Thaumiel:</strong> Used to contain or counteract other SCPs</li>
+            </ul>
+            
+            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-top: 2rem; border: 1px solid var(--protect-red);">
+              <strong style="color: var(--protect-red);">REMINDER:</strong> Information about the Foundation is classified. 
+              Unauthorized disclosure will result in immediate termination and amnestic treatment.
+            </div>
+          </div>
+        `;
+      }
+      
+      createWindow(title, content, options = {}) {
+        const window = document.createElement('div');
+        window.className = 'window';
+        window.style.width = options.width || '500px';
+        window.style.height = options.height || '400px';
+        window.style.top = (Math.random() * 200 + 100) + 'px';
+        window.style.left = (Math.random() * 300 + 200) + 'px';
+        window.style.zIndex = 1000 + this.activeWindows.length;
+        
+        window.innerHTML = `
+          <div class="window-header">
+            <div class="window-title">${title}</div>
+            <div class="window-controls">
+              <button class="window-btn minimize"></button>
+              <button class="window-btn maximize"></button>
+              <button class="window-btn close"></button>
+            </div>
+          </div>
+          <div class="window-content">${content}</div>
+        `;
+        
+        // Window controls
+        window.querySelector('.close').onclick = () => {
+          window.remove();
+          this.activeWindows = this.activeWindows.filter(w => w !== window);
+        };
+        
+        window.querySelector('.minimize').onclick = () => {
+          window.style.display = 'none';
+        };
+        
+        window.querySelector('.maximize').onclick = () => {
+          window.style.width = '90vw';
+          window.style.height = '80vh';
+          window.style.top = '10vh';
+          window.style.left = '5vw';
+        };
+        
+        // Make draggable
+        this.makeDraggable(window);
+        
+        document.body.appendChild(window);
+        this.activeWindows.push(window);
+        
+        return window;
+      }
+      
+      makeDraggable(element) {
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        
+        const header = element.querySelector('.window-header');
+        
+        header.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          offset.x = e.clientX - element.offsetLeft;
+          offset.y = e.clientY - element.offsetTop;
+          element.style.zIndex = 1000 + this.activeWindows.length;
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          
+          element.style.left = (e.clientX - offset.x) + 'px';
+          element.style.top = (e.clientY - offset.y) + 'px';
+        });
+        
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+      }
+      
+      switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.add('hidden');
+          tab.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const selectedTab = document.getElementById(tabName + 'Tab');
+        if (selectedTab) {
+          selectedTab.classList.remove('hidden');
+          selectedTab.classList.add('active');
+        }
+        
+        // Update nav buttons
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        
+        // Special handling for 3D tab
+        if (tabName === 'facility3d') {
+          setTimeout(() => this.init3DFacility(), 100);
+        }
+      }
+      
+      init3DFacility() {
+        if (this.facility3D) return; // Already initialized
+        
+        const container = document.getElementById('facility3d');
+        if (!container) return;
+        
+        // Enhanced 3D facility with advanced features
+        this.facility3D = new Advanced3DFacility(container);
+        this.facility3D.init();
+      }
+      
+      toggleAssistant() {
+        const panel = document.getElementById('assistantPanel');
+        const toggle = document.getElementById('assistantToggle');
+        
+        panel.classList.toggle('active');
+        toggle.classList.toggle('hidden', panel.classList.contains('active'));
+      }
+      
+      completeRequirement(requirement) {
+        this.state.tasks.forEach(task => {
+          if (task.requirements.includes(requirement)) {
+            task.progress = Math.min(100, task.progress + (100 / task.requirements.length));
+            
+            if (task.progress >= 100 && task.status !== 'completed') {
+              this.completeTask(task);
+            }
+          }
+        });
+        
+        this.renderTasks();
+        this.saveState();
+      }
+      
+      checkSCPProgress() {
+        const scpFiles = this.state.openedFiles.filter(file => 
+          this.files.find(f => f.id === file && f.type === 'scp')
+        );
+        
+        if (scpFiles.length >= 3) {
+          this.completeRequirement('scp-files-3');
+        }
+      }
+      
+      completeTask(task) {
+        task.status = 'completed';
+        this.state.completedTasks.push(task.id);
+        
+        // Handle rewards
+        if (task.reward.type === 'keycard') {
+          this.grantKeycard(task.reward.id);
+        } else if (task.reward.type === 'badge') {
+          this.grantBadge(task.reward.id);
+        }
+        
+        this.showNotification('Task Completed', task.title, 'success');
+        this.ai.respond('task_completed', { task: task.title });
+        
+        this.renderTasks();
+        this.updateUI();
+        this.saveState();
+      }
+      
+      grantKeycard(keycardId) {
+        if (this.state.keycards.includes(keycardId)) return;
+        
+        this.state.keycards.push(keycardId);
+        const keycard = this.keycards[keycardId];
+        this.state.clearance = Math.max(this.state.clearance, keycard.level);
+        
+        this.showNotification('Clearance Upgrade', `Level ${keycard.level} access granted`, 'success');
+        this.updateUI();
+      }
+      
+      grantBadge(badgeId) {
+        if (this.state.badges.includes(badgeId)) return;
+        
+        this.state.badges.push(badgeId);
+        this.showNotification('Achievement Unlocked', badgeId.charAt(0).toUpperCase() + badgeId.slice(1), 'success');
+      }
+      
+      updateUI() {
+        // Update clearance badge
+        const clearanceBadge = document.getElementById('clearanceBadge');
+        clearanceBadge.textContent = `LEVEL ${this.state.clearance}`;
+        clearanceBadge.className = this.state.clearance >= 5 ? 'clearance-badge level-5' : 'clearance-badge';
+        
+        // Update user name
+        document.getElementById('userName').textContent = this.state.user;
+        
+        // Re-render files to update access
+        this.renderFiles();
+      }
+      
+      showNotification(title, message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+          <div class="notification-title">${title}</div>
+          <div class="notification-message">${message}</div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+          notification.remove();
+        }, 5000);
+      }
+      
+      handleKeyboard(e) {
+        // System shortcuts
+        if (e.ctrlKey && e.key === '`') {
+          this.toggleAssistant();
+          e.preventDefault();
+        }
+        
+        if (e.key === 'F11') {
+          this.toggleFullscreen();
+          e.preventDefault();
+        }
+        
+        if (e.key === 'Escape') {
+          this.closeTopWindow();
+        }
+      }
+      
+      closeTopWindow() {
+        if (this.activeWindows.length > 0) {
+          const topWindow = this.activeWindows[this.activeWindows.length - 1];
+          topWindow.querySelector('.close').click();
+        }
+      }
+      
+      toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      }
+      
+      startSystemMonitoring() {
+        // Simulated facility monitoring
+        setInterval(() => {
+          this.updateFacilityStatus();
+          this.checkForRandomEvents();
+        }, 30000); // Every 30 seconds
+      }
+      
+      updateFacilityStatus() {
+        const statusEl = document.getElementById('containmentStatus');
+        const statuses = ['secure', 'caution', 'breach'];
+        const currentStatus = statuses[Math.floor(Math.random() * statuses.length)];
+        
+        const dot = statusEl.querySelector('.status-dot');
+        const text = statusEl.querySelector('span');
+        
+        dot.className = `status-dot ${currentStatus}`;
+        text.textContent = currentStatus === 'secure' ? 'Containment' : 
+                          currentStatus === 'caution' ? 'Monitoring' : 'Breach Alert';
+        
+        if (currentStatus === 'breach') {
+          this.handleContainmentBreach();
+        }
+      }
+      
+      handleContainmentBreach() {
+        this.showNotification('Containment Breach', 'Security teams mobilizing', 'danger');
+        this.ai.respond('containment_breach');
+      }
+      
+      checkForRandomEvents() {
+        if (Math.random() < 0.1) { // 10% chance
+          const events = [
+            () => this.ai.respond('anomaly_detected'),
+            () => this.showNotification('System Update', 'SCIPNET protocols updated', 'info'),
+            () => this.ai.respond('maintenance_window'),
+          ];
+          
+          const randomEvent = events[Math.floor(Math.random() * events.length)];
+          randomEvent();
+        }
+      }
+      
+      saveState() {
+        const stateKey = `scpf-os-ultra-${this.state.user.toLowerCase()}`;
+        localStorage.setItem(stateKey, JSON.stringify(this.state));
+      }
+      
+      loadState() {
+        const stateKey = `scpf-os-ultra-${this.state.user.toLowerCase()}`;
+        const saved = localStorage.getItem(stateKey);
+        
+        if (saved) {
+          try {
+            const parsedState = JSON.parse(saved);
+            this.state = { ...this.state, ...parsedState };
+          } catch (e) {
+            console.warn('Failed to load saved state');
+          }
+        }
+      }
+    }
+    
+    // Advanced AI Assistant
+    class AdvancedAI {
+      constructor() {
+        this.personality = 'scipnet09';
+        this.context = [];
+        this.responses = {
+          greet: [
+            "Welcome back to Site-19. I am SCIPNET-09, your advanced facility AI. All systems are operational.",
+            "Good to see you again. Facility status: Secure. How may I assist with your duties today?",
+            "SCIPNET-09 online. Current threat level: Green. What do you need assistance with?"
+          ],
+          file_opened: [
+            "File accessed successfully. All activity logged.",
+            "Document retrieved from secure database.",
+            "Information accessed. Cross-referencing with current protocols."
+          ],
+          access_denied: [
+            "Access denied. Your current clearance level is insufficient.",
+            "Security violation detected. This incident has been logged.",
+            "Clearance upgrade required for this document."
+          ],
+          task_completed: [
+            "Excellent work. Task completion registered.",
+            "Objective achieved. Updating personnel records.",
+            "Well done. Your efficiency rating has improved."
+          ],
+          containment_breach: [
+            "ALERT: Containment breach detected. Mobile Task Forces have been notified.",
+            "Security lockdown initiated. Please remain calm and follow evacuation procedures.",
+            "Emergency protocols activated. MTF units en route to your location."
+          ],
+          anomaly_detected: [
+            "Anomalous readings detected in Sector 7. Investigation teams dispatched.",
+            "Probability cascade anomaly identified. Recalibrating quantum stabilizers.",
+            "Unusual electromagnetic signatures detected. Analyzing threat potential."
+          ],
+          maintenance_window: [
+            "Scheduled maintenance window in 15 minutes. Save your work.",
+            "System optimization in progress. Temporary slowdowns expected.",
+            "Database synchronization commencing. Please stand by."
+          ]
+        };
+        this.messageHistory = [];
+      }
+      
+      async initialize() {
+        // Initialize AI personality and context
+        this.loadPersonality();
+      }
+      
+      loadPersonality() {
+        this.traits = {
+          professional: 0.8,
+          helpful: 0.9,
+          authoritative: 0.7,
+          empathetic: 0.3,
+          mysterious: 0.4
+        };
+      }
+      
+      respond(type, data = {}) {
+        const responses = this.responses[type] || ['System notification.'];
+        let response = responses[Math.floor(Math.random() * responses.length)];
+        
+        // Personalize response
+        if (data.file) {
+          response = response.replace(/file|document/i, data.file);
+        }
+        
+        if (data.task) {
+          response += ` Task: "${data.task}"`;
+        }
+        
+        this.displayMessage(response, 'assistant');
+      }
+      
+      greet() {
+        const greeting = this.responses.greet[Math.floor(Math.random() * this.responses.greet.length)];
+        this.displayMessage(greeting, 'assistant');
+        
+        // Show initial tasks
+        setTimeout(() => {
+          this.displayMessage("You have active assignments in your task panel. Complete them to advance your clearance level.", 'assistant');
+        }, 2000);
+      }
+      
+      displayMessage(message, sender = 'assistant') {
+        const assistantBody = document.getElementById('assistantBody');
+        if (!assistantBody) return;
+        
+        const messageEl = document.createElement('div');
+        messageEl.className = `assistant-message ${sender}`;
+        
+        if (sender === 'user') {
+          messageEl.setAttribute('data-user', window.scpOS.state.user);
+        }
+        
+        messageEl.innerHTML = `<div>${message}</div>`;
+        
+        // Add typing animation
+        messageEl.style.opacity = '0';
+        messageEl.style.transform = 'translateY(10px)';
+        assistantBody.appendChild(messageEl);
+        
+        setTimeout(() => {
+          messageEl.style.opacity = '1';
+          messageEl.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Scroll to bottom
+        assistantBody.scrollTop = assistantBody.scrollHeight;
+        
+        // Store in history
+        this.messageHistory.push({ message, sender, timestamp: Date.now() });
+        
+        // Auto-show assistant panel for important messages
+        if (sender === 'assistant' && !document.getElementById('assistantPanel').classList.contains('active')) {
+          setTimeout(() => {
+            document.getElementById('assistantPanel').classList.add('active');
+            document.getElementById('assistantToggle').classList.add('hidden');
+          }, 500);
+        }
+      }
+    }
+    
+    // Advanced 3D Facility System
+    class Advanced3DFacility {
+      constructor(container) {
+        this.container = container;
+        this.scene = null;
+        this.camera = null;
+        this.renderer = null;
+        this.controls = null;
+        this.facilities = [];
+        this.player = { position: new THREE.Vector3(0, 2, 5), velocity: new THREE.Vector3() };
+        this.keys = {};
+      }
+      
+      init() {
+        this.setupScene();
+        this.createFacility();
+        this.setupLighting();
+        this.setupControls();
+        this.setupPostProcessing();
+        this.animate();
+      }
+      
+      setupScene() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x0a0a0a);
+        this.scene.fog = new THREE.Fog(0x0a0a0a, 15, 100);
+        
+        this.camera = new THREE.PerspectiveCamera(
+          75,
+          this.container.clientWidth / this.container.clientHeight,
+          0.1,
+          1000
+        );
+        this.camera.position.copy(this.player.position);
+        
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 0.8;
+        
+        // Clear container and add renderer
+        this.container.innerHTML = '';
+        this.container.appendChild(this.renderer.domElement);
+      }
+      
+      createFacility() {
+        // Enhanced facility with multiple levels and detailed rooms
+        this.createFoundation();
+        this.createCorridors();
+        this.createRooms();
+        this.createElevators();
+        this.createSecurityFeatures();
+      }
+      
+      createFoundation() {
+        // Main floor
+        const floorGeometry = new THREE.PlaneGeometry(100, 100);
+        const floorMaterial = new THREE.MeshLambertMaterial({ 
+          color: 0x2a2a2a,
+          transparent: true,
+          opacity: 0.9
+        });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        this.scene.add(floor);
+        
+        // Ceiling with panels
+        const ceilingGeometry = new THREE.PlaneGeometry(100, 100);
+        const ceilingMaterial = new THREE.MeshLambertMaterial({ 
+          color: 0x1a1a1a,
+          transparent: true,
+          opacity: 0.8
+        });
+        const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+        ceiling.rotation.x = Math.PI / 2;
+        ceiling.position.y = 6;
+        this.scene.add(ceiling);
+      }
+      
+      createCorridors() {
+        const corridorMaterial = new THREE.MeshLambertMaterial({ color: 0x404040 });
+        
+        // Main corridor network
+        const corridors = [
+          { pos: [0, 2, 0], size: [60, 4, 4], rotation: [0, 0, 0] },
+          { pos: [0, 2, -20], size: [40, 4, 4], rotation: [0, Math.PI/2, 0] },
+          { pos: [0, 2, 20], size: [40, 4, 4], rotation: [0, Math.PI/2, 0] },
+        ];
+        
+        corridors.forEach(corridor => {
+          const geometry = new THREE.BoxGeometry(...corridor.size);
+          const mesh = new THREE.Mesh(geometry, corridorMaterial);
+          mesh.position.set(...corridor.pos);
+          mesh.rotation.set(...corridor.rotation);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          this.scene.add(mesh);
+        });
+      }
+      
+      createRooms() {
+        const rooms = [
+          // SCP Containment Chambers
+          { 
+            id: 'scp-173-chamber',
+            pos: [-15, 2.5, -15], 
+            size: [6, 5, 6],
+            color: 0x8B4513,
+            label: 'SCP-173\nContainment',
+            interactive: true,
+            action: () => window.scpOS.openFile(window.scpOS.files.find(f => f.id === 'scp-173'))
+          },
+          { 
+            id: 'scp-999-chamber',
+            pos: [15, 2.5, -15], 
+            size: [6, 5, 6],
+            color: 0xFF6B00,
+            label: 'SCP-999\nHabitat',
+            interactive: true,
+            action: () => window.scpOS.openFile(window.scpOS.files.find(f => f.id === 'scp-999'))
+          },
+          { 
+            id: 'scp-914-chamber',
+            pos: [0, 2.5, -30], 
+            size: [8, 5, 8],
+            color: 0x4169E1,
+            label: 'SCP-914\nTesting Chamber',
+            interactive: true,
+            action: () => window.scpOS.openFile(window.scpOS.files.find(f => f.id === 'scp-914'))
+          },
+          
+          // Facility Operations
+          { 
+            id: 'research-lab',
+            pos: [-20, 2.5, 0], 
+            size: [6, 5, 6],
+            color: 0x556B2F,
+            label: 'Research\nLaboratory Alpha',
+            interactive: true,
+            action: () => window.scpOS.showNotification('Research Lab', 'Advanced analysis equipment detected', 'info')
+          },
+          { 
+            id: 'security-office',
+            pos: [20, 2.5, 0], 
+            size: [6, 5, 6],
+            color: 0xDC143C,
+            label: 'Security\nCommand Center',
+            interactive: true,
+            action: () => window.scpOS.openFile(window.scpOS.files.find(f => f.id === 'terminal'))
+          },
+          { 
+            id: 'database-core',
+            pos: [0, 2.5, 25], 
+            size: [6, 5, 6],
+            color: 0x9932CC,
+            label: 'Data Center\nCore',
+            interactive: true,
+            action: () => window.scpOS.showNotification('Database Core', 'Quantum storage array active', 'info')
+          },
+          
+          // Administrative areas
+          { 
+            id: 'briefing-room',
+            pos: [-15, 2.5, 15], 
+            size: [6, 5, 6],
+            color: 0x708090,
+            label: 'Briefing\nRoom Alpha',
+            interactive: true,
+            action: () => window.scpOS.showNotification('Briefing Room', 'Mission planning interface ready', 'info')
+          },
+          { 
+            id: 'medical-bay',
+            pos: [15, 2.5, 15], 
+            size: [6, 5, 6],
+            color: 0x228B22,
+            label: 'Medical Bay\nTrauma Unit',
+            interactive: true,
+            action: () => window.scpOS.showNotification('Medical Bay', 'Emergency medical protocols active', 'info')
+          }
+        ];
+        
+        rooms.forEach(room => {
+          // Room structure
+          const geometry = new THREE.BoxGeometry(...room.size);
+          const material = new THREE.MeshLambertMaterial({ 
+            color: room.color,
+            transparent: true,
+            opacity: 0.7
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.set(...room.pos);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.userData = room;
+          
+          if (room.interactive) {
+            mesh.userData.clickable = true;
+          }
+          
+          this.scene.add(mesh);
+          this.facilities.push(mesh);
+          
+          // Room label
+          this.createRoomLabel(room.label, room.pos);
+          
+          // Room lighting
+          this.addRoomLighting(room.pos, room.color);
+        });
+      }
+      
+      createRoomLabel(text, position) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 512;
+        canvas.height = 256;
+        
+        // Background
+        context.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        context.fillRect(0, 0, 512, 256);
+        
+        // Text
+        context.fillStyle = '#FFFFFF';
+        context.font = 'bold 24px "Orbitron"';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        const lines = text.split('\n');
+        lines.forEach((line, index) => {
+          context.fillText(line, 256, 128 + (index - lines.length/2 + 0.5) * 30);
+        });
+        
+        // Border
+        context.strokeStyle = '#FF6B00';
+        context.lineWidth = 4;
+        context.strokeRect(0, 0, 512, 256);
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        const material = new THREE.MeshBasicMaterial({ 
+          map: texture,
+          transparent: true,
+          alphaTest: 0.1
+        });
+        const geometry = new THREE.PlaneGeometry(3, 1.5);
+        const label = new THREE.Mesh(geometry, material);
+        label.position.set(position[0], position[1] + 4, position[2]);
+        label.lookAt(0, position[1] + 4, 0);
+        
+        this.scene.add(label);
+      }
+      
+      addRoomLighting(position, color) {
+        const light = new THREE.PointLight(color, 0.5, 15);
+        light.position.set(position[0], position[1] + 2, position[2]);
+        light.castShadow = true;
+        light.shadow.mapSize.width = 1024;
+        light.shadow.mapSize.height = 1024;
+        this.scene.add(light);
+      }
+      
+      createElevators() {
+        // Central elevator shaft
+        const elevatorGeometry = new THREE.BoxGeometry(3, 10, 3);
+        const elevatorMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+        const elevator = new THREE.Mesh(elevatorGeometry, elevatorMaterial);
+        elevator.position.set(0, 5, 0);
+        this.scene.add(elevator);
+      }
+      
+      createSecurityFeatures() {
+        // Security cameras
+        const cameraPositions = [
+          [-25, 4, -25], [25, 4, -25], [-25, 4, 25], [25, 4, 25],
+          [0, 4, -35], [0, 4, 35], [-35, 4, 0], [35, 4, 0]
+        ];
+        
+        cameraPositions.forEach(pos => {
+          const cameraGeometry = new THREE.SphereGeometry(0.3);
+          const cameraMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+          const camera = new THREE.Mesh(cameraGeometry, cameraMaterial);
+          camera.position.set(...pos);
+          this.scene.add(camera);
+          
+          // Red LED light
+          const ledLight = new THREE.PointLight(0xFF0000, 0.3, 5);
+          ledLight.position.copy(camera.position);
+          this.scene.add(ledLight);
+        });
+      }
+      
+      setupLighting() {
+        // Ambient lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.2);
+        this.scene.add(ambientLight);
+        
+        // Main directional light
+        const directionalLight = new THREE.DirectionalLight(0x808080, 0.6);
+        directionalLight.position.set(10, 20, 10);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 50;
+        directionalLight.shadow.camera.left = -40;
+        directionalLight.shadow.camera.right = 40;
+        directionalLight.shadow.camera.top = 40;
+        directionalLight.shadow.camera.bottom = -40;
+        this.scene.add(directionalLight);
+        
+        // Emergency lighting (red strips)
+        const emergencyLight1 = new THREE.DirectionalLight(0xFF0044, 0.3);
+        emergencyLight1.position.set(-20, 5, 0);
+        this.scene.add(emergencyLight1);
+        
+        const emergencyLight2 = new THREE.DirectionalLight(0xFF0044, 0.3);
+        emergencyLight2.position.set(20, 5, 0);
+        this.scene.add(emergencyLight2);
+      }
+      
+      setupControls() {
+        // First-person controls
+        document.addEventListener('keydown', (e) => {
+          this.keys[e.code] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+          this.keys[e.code] = false;
+        });
+        
+        // Mouse controls for camera
+        let mouseX = 0, mouseY = 0;
+        let pitch = 0, yaw = 0;
+        
+        this.renderer.domElement.addEventListener('click', () => {
+          this.renderer.domElement.requestPointerLock();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+          if (document.pointerLockElement === this.renderer.domElement) {
+            mouseX = e.movementX || 0;
+            mouseY = e.movementY || 0;
+            
+            yaw -= mouseX * 0.002;
+            pitch -= mouseY * 0.002;
+            pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
+            
+            this.camera.rotation.order = 'YXZ';
+            this.camera.rotation.y = yaw;
+            this.camera.rotation.x = pitch;
+          }
+        });
+        
+        // Click detection for room interaction
+        this.renderer.domElement.addEventListener('click', (e) => {
+          if (document.pointerLockElement !== this.renderer.domElement) return;
+          
+          this.handleRoomInteraction();
+        });
+      }
+      
+      handleRoomInteraction() {
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+        
+        const intersects = raycaster.intersectObjects(this.facilities);
+        
+        if (intersects.length > 0) {
+          const room = intersects[0].object.userData;
+          if (room.interactive && room.action) {
+            document.exitPointerLock();
+            room.action();
+          }
+        }
+      }
+      
+      setupPostProcessing() {
+        // Add subtle bloom and film grain effects
+        // This would be enhanced with post-processing libraries in a real implementation
+      }
+      
+      updatePlayerMovement() {
+        const moveVector = new THREE.Vector3();
+        const speed = 0.1;
+        
+        if (this.keys['KeyW']) moveVector.z -= speed;
+        if (this.keys['KeyS']) moveVector.z += speed;
+        if (this.keys['KeyA']) moveVector.x -= speed;
+        if (this.keys['KeyD']) moveVector.x += speed;
+        
+        // Apply camera rotation to movement
+        moveVector.applyEuler(new THREE.Euler(0, this.camera.rotation.y, 0));
+        
+        this.player.position.add(moveVector);
+        
+        // Collision detection and boundaries
+        this.player.position.x = Math.max(-45, Math.min(45, this.player.position.x));
+        this.player.position.z = Math.max(-45, Math.min(45, this.player.position.z));
+        this.player.position.y = 2; // Keep at walking height
+        
+        this.camera.position.copy(this.player.position);
+      }
+      
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        
+        this.updatePlayerMovement();
+        this.updateDynamicElements();
+        this.renderer.render(this.scene, this.camera);
+      }
+      
+      updateDynamicElements() {
+        // Animate security camera rotation
+        this.scene.children.forEach(child => {
+          if (child.geometry && child.geometry.type === 'SphereGeometry' && child.material.color.getHex() === 0x000000) {
+            child.rotation.y += 0.01;
+          }
+        });
+        
+        // Pulse emergency lighting
+        const time = Date.now() * 0.001;
+        this.scene.children.forEach(child => {
+          if (child.type === 'DirectionalLight' && child.color.getHex() === 0xFF0044) {
+            child.intensity = 0.3 + Math.sin(time * 2) * 0.1;
+          }
+        });
+      }
+    }
+    
+    // Initialize the system
+    window.scpOS = new SCPFoundationOS();
+  </script>
+</body>
+</html>
